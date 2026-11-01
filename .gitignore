@@ -1,0 +1,10 @@
+.pytest_cache/
+__pycache__/
+*.pyc
+ucli.key
+build/
+syn/work/
+syn/results/*/mapped.v
+syn/reports/
+syn/results/
+*.log

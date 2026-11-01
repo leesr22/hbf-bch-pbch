@@ -1,0 +1,8 @@
+defects,trials,greedy_mean_failures,optimum_mean_failures,greedy_optimal_fraction,fully_maskable_fraction
+1,200,0.0,0.0,1.0,1.0
+4,200,0.0,0.0,1.0,1.0
+8,200,0.0,0.0,1.0,1.0
+15,200,0.375,0.36,0.985,0.64
+20,200,2.575,1.52,0.36,0.025
+32,200,8.6,4.815,0.095,0.0
+64,200,24.375,15.825,0.02,0.0

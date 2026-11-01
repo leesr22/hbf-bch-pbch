@@ -1,0 +1,24 @@
+{
+  "profile": "bch_d1",
+  "width": 512,
+  "k": 4096,
+  "r": 156,
+  "n": 4252,
+  "t": 12,
+  "errors_polynomial_positions": [
+    218,
+    442,
+    717,
+    1343,
+    1465,
+    1557,
+    1559,
+    1603,
+    1710,
+    2152,
+    2263,
+    3252
+  ],
+  "message_beats": 8,
+  "codeword_beats": 9
+}

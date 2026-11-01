@@ -1,0 +1,38 @@
+{
+  "bch_d1": {
+    "k": 4096,
+    "r": 156,
+    "n": 4252,
+    "t": 12,
+    "generator": "0x1e4873256115a56784a6940a4c6e6d7e1205e051"
+  },
+  "bch_d2": {
+    "k": 4096,
+    "r": 364,
+    "n": 4460,
+    "t": 28,
+    "generator": "0x1bb4b458a849595166cf6d0ad95b440162fb31231b54913bd16b7f4fd1b65c5386132d4f11e7ebd57763425a5aa3"
+  },
+  "pbch_d1": {
+    "k": 4096,
+    "l": 3,
+    "r": 104,
+    "n": 4203,
+    "t": 8,
+    "mask_primitive": "0xb",
+    "mask_seed": "0x7",
+    "zero_influence_columns": 7,
+    "unique_influence_columns": 8
+  },
+  "pbch_d2": {
+    "k": 4096,
+    "l": 15,
+    "r": 104,
+    "n": 4215,
+    "t": 8,
+    "mask_primitive": "0x8003",
+    "mask_seed": "0x3341",
+    "zero_influence_columns": 0,
+    "unique_influence_columns": 4206
+  }
+}

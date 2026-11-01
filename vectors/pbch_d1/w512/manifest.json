@@ -1,0 +1,37 @@
+{
+  "profile": "pbch_d1",
+  "width": 512,
+  "k": 4096,
+  "l": 3,
+  "r": 104,
+  "n": 4203,
+  "t": 8,
+  "selector": 7,
+  "mask_failures": 3,
+  "probe_positions_stream": [
+    228,
+    618,
+    642,
+    1141,
+    1420,
+    1548,
+    2343,
+    2567,
+    2819,
+    3511,
+    3659,
+    4154
+  ],
+  "errors_polynomial_positions": [
+    282,
+    1120,
+    1291,
+    1557,
+    2614,
+    3101,
+    3554,
+    3952
+  ],
+  "message_beats": 8,
+  "codeword_beats": 10
+}
