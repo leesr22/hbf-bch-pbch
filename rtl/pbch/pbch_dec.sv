@@ -31,6 +31,7 @@ module pbch_dec #(
     input  wire                 clk,
     input  wire                 reset_n,
     input  wire                 start_i,
+    output wire                 start_ready_o,
     input  wire [W-1:0]         code_bits_i,
     input  wire [COUNT_W-1:0]   code_count_i,
     input  wire                 code_valid_i,
@@ -80,6 +81,7 @@ module pbch_dec #(
         .CHIEN_ADVANCE_PARTIAL_B(CHIEN_ADVANCE_PARTIAL_B)
     ) bch_dec_u (
         .clk(clk), .reset_n(reset_n), .start_i(start_i),
+        .start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i), .code_count_i(code_count_i),
         .code_valid_i(code_valid_i), .code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o), .replay_bits_i(replay_bits_i),
@@ -93,7 +95,7 @@ module pbch_dec #(
     pbch_mask #(
         .L(L), .W(W), .MASK_POLYNOMIAL(MASK_POLYNOMIAL), .MASK_SEED(MASK_SEED)
     ) unmask_u (
-        .clk(clk), .reset_n(reset_n), .start_i(start_i),
+        .clk(clk), .reset_n(reset_n), .start_i(replay_req_o),
         .selector_i(selector_o), .in_bits_i(parent_info_bits),
         .in_count_i(parent_info_count),
         .in_valid_i(parent_info_valid && !expect_selector_q),
@@ -106,7 +108,7 @@ module pbch_dec #(
         if (!reset_n) begin
             expect_selector_q <= 1'b1;
             selector_o <= '0;
-        end else if (start_i) begin
+        end else if (replay_req_o) begin
             expect_selector_q <= 1'b1;
             selector_o <= '0;
         end else if (expect_selector_q && parent_info_valid && parent_info_ready) begin

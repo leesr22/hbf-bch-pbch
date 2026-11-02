@@ -1,0 +1,9 @@
+profile,kind,width,latency_cycles,ii_cycles
+bch_d1,enc,64,68,67
+bch_d1,dec,64,190,69
+bch_d2,enc,64,71,70
+bch_d2,dec,64,260,72
+pbch_d1,enc,64,153,83
+pbch_d1,dec,64,174,69
+pbch_d2,enc,64,188,118
+pbch_d2,dec,64,174,69

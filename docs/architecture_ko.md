@@ -49,7 +49,8 @@ PBCH information word의 좌표 순서는 `[d | m XOR dM]`이다. 논문 초안�
 
 모듈은 다음처럼 나뉜다.
 
-- `bch_enc`: `t=8` parent BCH를 두 pass에서 재사용한다.
+- `bch_enc`: 같은 `t=8` parent BCH 구조를 PREP와 EMIT에 하나씩 둔다. 두 코어를
+  중첩 실행해 codeword 간 initiation interval을 줄인다.
 - `pbch_probe`: `c(0)`와 pre-read bitmap을 같은 beat로 받아 defect가 있는 위치만
   한 개씩 제약식으로 만든다. defect가 없는 beat는 매 cycle 통과한다.
 - `pbch_g0`: 해당 위치에서 selector가 codeword를 어떻게 바꾸는지 나타내는
@@ -77,23 +78,36 @@ optimum과 차이가 커지므로 결과에 이 제한을 명시한다.
 
 ## BCH/PBCH decoder
 
-`bch_dec`은 세 계산 블록을 순서대로 사용한다.
+`bch_dec`은 세 계산 블록을 codeword-level pipeline으로 사용한다.
 
 1. `bch_syndrome`: odd syndrome `S1,S3,...,S(2t-1)`만 저장하고 even syndrome은
    GF square로 복원한다. full beat, selector, 마지막 parity fragment를 각각
    closed-form 선형망으로 만든다.
 2. `bch_bm`: two-phase inversionless Berlekamp-Massey로 error-locator polynomial을
-   구한다.
+   구한다. D1/PBCH는 한 lane, BM이 scan보다 느린 BCH-D2는 동일 core 두 개를
+   round-robin interleaving한다.
 3. `bch_chien`: 외부 buffer에서 replay한 codeword와 병렬 Chien root mask를
    같은 cycle에 합쳐 corrected information을 출력한다.
 
 `pbch_dec`은 동일한 `t=8` BCH decoder 출력을 받아 첫 `l` corrected bits를
 selector로 저장하고, 나머지 4096 bits에 스트리밍 `dM`을 XOR한다.
 
-현재 top은 이해와 단독 비교를 위해 한 frame을 syndrome→BM→replay 순서로 끝낸 뒤
-다음 frame을 받는다. 세 stage의 inter-frame overlap은 구현하지 않았으므로 3.072
-TB/s 정규화 수량은 이 보수적인 standalone engine의 measured initiation interval을
-사용한다.
+각 stage 사이에는 전체 codeword가 아니라 syndrome, locator polynomial, degree와
+valid bit만 저장한다. 따라서 frame A가 Chien/replay 중일 때 frame B는 BM, frame C는
+syndrome 계산을 수행할 수 있다. `start_ready_o`는 context가 넘치지 않도록
+backpressure를 제공한다. `t=28` BCH-D2는 BM 두 lane을 번갈아 써서 한 lane의 긴
+latency를 숨기고 scan/Chien 처리율에 맞춘다. zero syndrome도 같은 BM 경로로 보내
+zero/error frame이 섞여도 동일한 initiation interval과 in-order 출력을 유지한다.
+
+Encoder도 inter-frame 동작을 지원한다. BCH encoder는 마지막 parity beat와 다음
+`start_i`를 같은 cycle에 받아 output bubble을 제거한다. PBCH encoder는 base
+BCH/probe/solver와 final BCH/mask를 별도 stage로 두어 서로 다른 frame을 동시에
+처리한다. 이를 위해 base-data stream과 final-pass replay stream은 별도 ready/valid
+port를 가진다.
+
+Decoder pipeline 역시 새 codeword scan과 이전 codeword replay를 동시에 공급받는다.
+이는 codec core 바깥의 banked cache 또는 두 논리 stream을 제공하는 arbitration을
+가정한다. 전체 codeword FF와 cache/interconnect 면적은 codec 면적에 포함하지 않는다.
 
 ## 면적과 throughput 계산
 
@@ -101,14 +115,14 @@ TB/s 정규화 수량은 이 보수적인 standalone engine의 measured initiati
 - clock uncertainty: 0.20 ns, input/output delay: 0.40 ns
 - 합성: Design Compiler `compile_ultra -no_autoungroup`
 - NAND2 기준: `STP_ND2_0P5 = 0.504 um^2`
-- 한 engine throughput: `512 byte * frequency / verified cycles`
+- 한 engine throughput: `512 byte * frequency / verified steady-state II`
 - 필요한 수: `ceil(3072 GB/s / one-engine GB/s)`
 - 총 면적: `mapped cell area * 필요한 수`
 
-PBCH encoder VCS 벡터는 solver stress를 위해 D1 12개, D2 32개의 defect를 넣었다.
-목표 환경 throughput 계산에서는 제약 하나당 한 cycle인 구조를 이용해 각각
+PBCH encoder의 multi-frame VCS 벡터는 solver stress를 위해 D1 12개, D2 32개의
+defect를 넣었다. 목표 환경 throughput 계산에서는 제약 하나당 한 cycle인 구조를 이용해 각각
 `4203*1e-4=0.4203`, `4215*1e-3=4.215` defects의 평균 cycle로 보정한다. Decoder는
-각 profile의 최대 `t` 오류를 실제로 주입한 보수적 cycle을 사용한다.
+각 profile의 최대 `t` 오류를 모든 연속 frame에 실제로 주입한 보수적 II를 사용한다.
 
 HBF v0.7 Table 2의 정확한 목표인 `3072 GB/s` user bandwidth를 사용한다. 이 수량
 정규화는 독립 engine을 필요한 만큼 복제했을 때의 codec core cell area이며, 공유

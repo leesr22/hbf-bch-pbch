@@ -42,6 +42,7 @@ module bch_profile_tb;
     string vec_dir;
 
     reg enc_start;
+    wire enc_start_ready;
     reg [W-1:0] enc_in_bits;
     reg [COUNT_W-1:0] enc_in_count;
     reg enc_in_valid;
@@ -55,6 +56,7 @@ module bch_profile_tb;
     wire enc_busy;
 
     reg dec_start;
+    wire dec_start_ready;
     reg [W-1:0] code_bits;
     reg [COUNT_W-1:0] code_count;
     reg code_valid;
@@ -82,6 +84,7 @@ module bch_profile_tb;
 
     `ENC_TOP enc_u (
         .clk(clk), .reset_n(reset_n), .start_i(enc_start),
+        .start_ready_o(enc_start_ready),
         .in_bits_i(enc_in_bits), .in_count_i(enc_in_count),
         .in_valid_i(enc_in_valid), .in_ready_o(enc_in_ready),
         .out_bits_o(enc_out_bits), .out_count_o(enc_out_count),
@@ -91,6 +94,7 @@ module bch_profile_tb;
 
     `DEC_TOP dec_u (
         .clk(clk), .reset_n(reset_n), .start_i(dec_start),
+        .start_ready_o(dec_start_ready),
         .code_bits_i(code_bits), .code_count_i(code_count),
         .code_valid_i(code_valid), .code_ready_o(code_ready),
         .replay_req_o(replay_req), .replay_bits_i(replay_bits),

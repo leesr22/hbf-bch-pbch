@@ -1,9 +1,11 @@
 `default_nettype none
 
 module pbch_d1_enc_w32 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [31:0] data_bits_i,input wire [$clog2(32+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [31:0] replay_bits_i,input wire [$clog2(32+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [31:0] probe_bits_i,input wire [$clog2(32+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [31:0] out_bits_o,output wire [$clog2(32+1)-1:0] out_count_o,
@@ -16,10 +18,14 @@ module pbch_d1_enc_w32 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7),
+        .EXACT_SOLVER(1),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(312'hd6d5ca07ddd5eef78494a2a93f4525d62341d5128d50b9f3f7d934ede25a360d9eab09818b923b)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -28,7 +34,7 @@ module pbch_d1_enc_w32 (
 endmodule
 
 module pbch_d1_dec_w32 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [31:0] code_bits_i,input wire [$clog2(32+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [31:0] replay_bits_i,input wire [$clog2(32+1)-1:0] replay_count_i,
@@ -53,7 +59,7 @@ module pbch_d1_dec_w32 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h0d966247c176eb176c2d0360200001),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -64,9 +70,11 @@ module pbch_d1_dec_w32 (
 endmodule
 
 module pbch_d1_enc_w64 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [63:0] data_bits_i,input wire [$clog2(64+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [63:0] replay_bits_i,input wire [$clog2(64+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [63:0] probe_bits_i,input wire [$clog2(64+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [63:0] out_bits_o,output wire [$clog2(64+1)-1:0] out_count_o,
@@ -79,10 +87,14 @@ module pbch_d1_enc_w64 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7),
+        .EXACT_SOLVER(1),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(312'hd6d5ca07ddd5eef78494a2a93f4525d62341d5128d50b9f3f7d934ede25a360d9eab09818b923b)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -91,7 +103,7 @@ module pbch_d1_enc_w64 (
 endmodule
 
 module pbch_d1_dec_w64 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [63:0] code_bits_i,input wire [$clog2(64+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [63:0] replay_bits_i,input wire [$clog2(64+1)-1:0] replay_count_i,
@@ -116,7 +128,7 @@ module pbch_d1_dec_w64 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h083439d5bcddada37e7963a36ea001),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -127,9 +139,11 @@ module pbch_d1_dec_w64 (
 endmodule
 
 module pbch_d1_enc_w128 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [127:0] data_bits_i,input wire [$clog2(128+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [127:0] replay_bits_i,input wire [$clog2(128+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [127:0] probe_bits_i,input wire [$clog2(128+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [127:0] out_bits_o,output wire [$clog2(128+1)-1:0] out_count_o,
@@ -142,10 +156,14 @@ module pbch_d1_enc_w128 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7),
+        .EXACT_SOLVER(1),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(312'hd6d5ca07ddd5eef78494a2a93f4525d62341d5128d50b9f3f7d934ede25a360d9eab09818b923b)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -154,7 +172,7 @@ module pbch_d1_enc_w128 (
 endmodule
 
 module pbch_d1_dec_w128 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [127:0] code_bits_i,input wire [$clog2(128+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [127:0] replay_bits_i,input wire [$clog2(128+1)-1:0] replay_count_i,
@@ -179,7 +197,7 @@ module pbch_d1_dec_w128 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h00f7d99e297c38b7e8c2c92905a001),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -190,9 +208,11 @@ module pbch_d1_dec_w128 (
 endmodule
 
 module pbch_d1_enc_w256 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [255:0] data_bits_i,input wire [$clog2(256+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [255:0] replay_bits_i,input wire [$clog2(256+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [255:0] probe_bits_i,input wire [$clog2(256+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [255:0] out_bits_o,output wire [$clog2(256+1)-1:0] out_count_o,
@@ -205,10 +225,14 @@ module pbch_d1_enc_w256 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7),
+        .EXACT_SOLVER(1),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(312'hd6d5ca07ddd5eef78494a2a93f4525d62341d5128d50b9f3f7d934ede25a360d9eab09818b923b)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -217,7 +241,7 @@ module pbch_d1_enc_w256 (
 endmodule
 
 module pbch_d1_dec_w256 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [255:0] code_bits_i,input wire [$clog2(256+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [255:0] replay_bits_i,input wire [$clog2(256+1)-1:0] replay_count_i,
@@ -242,7 +266,7 @@ module pbch_d1_dec_w256 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h00f7d99e297c38b7e8c2c92905a001),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -253,9 +277,11 @@ module pbch_d1_dec_w256 (
 endmodule
 
 module pbch_d1_enc_w512 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [511:0] data_bits_i,input wire [$clog2(512+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [511:0] replay_bits_i,input wire [$clog2(512+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [511:0] probe_bits_i,input wire [$clog2(512+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [511:0] out_bits_o,output wire [$clog2(512+1)-1:0] out_count_o,
@@ -268,10 +294,14 @@ module pbch_d1_enc_w512 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7),
+        .EXACT_SOLVER(1),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(312'hd6d5ca07ddd5eef78494a2a93f4525d62341d5128d50b9f3f7d934ede25a360d9eab09818b923b)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -280,7 +310,7 @@ module pbch_d1_enc_w512 (
 endmodule
 
 module pbch_d1_dec_w512 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [511:0] code_bits_i,input wire [$clog2(512+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [511:0] replay_bits_i,input wire [$clog2(512+1)-1:0] replay_count_i,
@@ -305,7 +335,7 @@ module pbch_d1_dec_w512 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h00f7d99e297c38b7e8c2c92905a001),
         .MASK_POLYNOMIAL(4'hb),
         .MASK_SEED(3'h7)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -316,9 +346,11 @@ module pbch_d1_dec_w512 (
 endmodule
 
 module pbch_d2_enc_w32 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [31:0] data_bits_i,input wire [$clog2(32+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [31:0] replay_bits_i,input wire [$clog2(32+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [31:0] probe_bits_i,input wire [$clog2(32+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [31:0] out_bits_o,output wire [$clog2(32+1)-1:0] out_count_o,
@@ -331,10 +363,14 @@ module pbch_d2_enc_w32 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341),
+        .EXACT_SOLVER(0),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(1560'h878d55ca0001f913417581b6ef91b6de9a85da6e13535c99cf7400eda77458a30c7d162546da6d40ab13f0f421be1f55897ffedbae22bdc633b6796b52a6957b8a1a6d88aff91e279b6d571428f0af604080470059006dd0ce14a73c02ea897a091e18326a5a02a200248b3eab8508f4732aa6e96847cb5da639dfd82480c1bd368afdd92f7f1c67d6627beec04613b910642a4f685d32e73e8e8b1acae881d14b4310393e654d1ae77e56d0e609957b789fcf5010d4062643d9c3b48ef15d3fb2840e)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -343,7 +379,7 @@ module pbch_d2_enc_w32 (
 endmodule
 
 module pbch_d2_dec_w32 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [31:0] code_bits_i,input wire [$clog2(32+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [31:0] replay_bits_i,input wire [$clog2(32+1)-1:0] replay_count_i,
@@ -368,7 +404,7 @@ module pbch_d2_dec_w32 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h0d966247c176eb176c2d0360200001),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -379,9 +415,11 @@ module pbch_d2_dec_w32 (
 endmodule
 
 module pbch_d2_enc_w64 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [63:0] data_bits_i,input wire [$clog2(64+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [63:0] replay_bits_i,input wire [$clog2(64+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [63:0] probe_bits_i,input wire [$clog2(64+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [63:0] out_bits_o,output wire [$clog2(64+1)-1:0] out_count_o,
@@ -394,10 +432,14 @@ module pbch_d2_enc_w64 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341),
+        .EXACT_SOLVER(0),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(1560'h878d55ca0001f913417581b6ef91b6de9a85da6e13535c99cf7400eda77458a30c7d162546da6d40ab13f0f421be1f55897ffedbae22bdc633b6796b52a6957b8a1a6d88aff91e279b6d571428f0af604080470059006dd0ce14a73c02ea897a091e18326a5a02a200248b3eab8508f4732aa6e96847cb5da639dfd82480c1bd368afdd92f7f1c67d6627beec04613b910642a4f685d32e73e8e8b1acae881d14b4310393e654d1ae77e56d0e609957b789fcf5010d4062643d9c3b48ef15d3fb2840e)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -406,7 +448,7 @@ module pbch_d2_enc_w64 (
 endmodule
 
 module pbch_d2_dec_w64 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [63:0] code_bits_i,input wire [$clog2(64+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [63:0] replay_bits_i,input wire [$clog2(64+1)-1:0] replay_count_i,
@@ -431,7 +473,7 @@ module pbch_d2_dec_w64 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h083439d5bcddada37e7963a36ea001),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -442,9 +484,11 @@ module pbch_d2_dec_w64 (
 endmodule
 
 module pbch_d2_enc_w128 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [127:0] data_bits_i,input wire [$clog2(128+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [127:0] replay_bits_i,input wire [$clog2(128+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [127:0] probe_bits_i,input wire [$clog2(128+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [127:0] out_bits_o,output wire [$clog2(128+1)-1:0] out_count_o,
@@ -457,10 +501,14 @@ module pbch_d2_enc_w128 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341),
+        .EXACT_SOLVER(0),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(1560'h878d55ca0001f913417581b6ef91b6de9a85da6e13535c99cf7400eda77458a30c7d162546da6d40ab13f0f421be1f55897ffedbae22bdc633b6796b52a6957b8a1a6d88aff91e279b6d571428f0af604080470059006dd0ce14a73c02ea897a091e18326a5a02a200248b3eab8508f4732aa6e96847cb5da639dfd82480c1bd368afdd92f7f1c67d6627beec04613b910642a4f685d32e73e8e8b1acae881d14b4310393e654d1ae77e56d0e609957b789fcf5010d4062643d9c3b48ef15d3fb2840e)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -469,7 +517,7 @@ module pbch_d2_enc_w128 (
 endmodule
 
 module pbch_d2_dec_w128 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [127:0] code_bits_i,input wire [$clog2(128+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [127:0] replay_bits_i,input wire [$clog2(128+1)-1:0] replay_count_i,
@@ -494,7 +542,7 @@ module pbch_d2_dec_w128 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h00f7d99e297c38b7e8c2c92905a001),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -505,9 +553,11 @@ module pbch_d2_dec_w128 (
 endmodule
 
 module pbch_d2_enc_w256 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [255:0] data_bits_i,input wire [$clog2(256+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [255:0] replay_bits_i,input wire [$clog2(256+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [255:0] probe_bits_i,input wire [$clog2(256+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [255:0] out_bits_o,output wire [$clog2(256+1)-1:0] out_count_o,
@@ -520,10 +570,14 @@ module pbch_d2_enc_w256 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341),
+        .EXACT_SOLVER(0),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(1560'h878d55ca0001f913417581b6ef91b6de9a85da6e13535c99cf7400eda77458a30c7d162546da6d40ab13f0f421be1f55897ffedbae22bdc633b6796b52a6957b8a1a6d88aff91e279b6d571428f0af604080470059006dd0ce14a73c02ea897a091e18326a5a02a200248b3eab8508f4732aa6e96847cb5da639dfd82480c1bd368afdd92f7f1c67d6627beec04613b910642a4f685d32e73e8e8b1acae881d14b4310393e654d1ae77e56d0e609957b789fcf5010d4062643d9c3b48ef15d3fb2840e)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -532,7 +586,7 @@ module pbch_d2_enc_w256 (
 endmodule
 
 module pbch_d2_dec_w256 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [255:0] code_bits_i,input wire [$clog2(256+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [255:0] replay_bits_i,input wire [$clog2(256+1)-1:0] replay_count_i,
@@ -557,7 +611,7 @@ module pbch_d2_dec_w256 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h00f7d99e297c38b7e8c2c92905a001),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -568,9 +622,11 @@ module pbch_d2_dec_w256 (
 endmodule
 
 module pbch_d2_enc_w512 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [511:0] data_bits_i,input wire [$clog2(512+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [511:0] replay_bits_i,input wire [$clog2(512+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [511:0] probe_bits_i,input wire [$clog2(512+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [511:0] out_bits_o,output wire [$clog2(512+1)-1:0] out_count_o,
@@ -583,10 +639,14 @@ module pbch_d2_enc_w512 (
         .BCH_GENERATOR(105'h115f914e07b0c138741c5c4fb23),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341),
+        .EXACT_SOLVER(0),
+        .PIPELINED_SOLVER(0),
         .PARITY_COLUMNS(1560'h878d55ca0001f913417581b6ef91b6de9a85da6e13535c99cf7400eda77458a30c7d162546da6d40ab13f0f421be1f55897ffedbae22bdc633b6796b52a6957b8a1a6d88aff91e279b6d571428f0af604080470059006dd0ce14a73c02ea897a091e18326a5a02a200248b3eab8508f4732aa6e96847cb5da639dfd82480c1bd368afdd92f7f1c67d6627beec04613b910642a4f685d32e73e8e8b1acae881d14b4310393e654d1ae77e56d0e609957b789fcf5010d4062643d9c3b48ef15d3fb2840e)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -595,7 +655,7 @@ module pbch_d2_enc_w512 (
 endmodule
 
 module pbch_d2_dec_w512 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [511:0] code_bits_i,input wire [$clog2(512+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [511:0] replay_bits_i,input wire [$clog2(512+1)-1:0] replay_count_i,
@@ -620,7 +680,7 @@ module pbch_d2_dec_w512 (
         .CHIEN_ADVANCE_PARTIAL_B(117'h00f7d99e297c38b7e8c2c92905a001),
         .MASK_POLYNOMIAL(16'h8003),
         .MASK_SEED(15'h3341)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),

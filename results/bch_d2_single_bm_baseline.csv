@@ -1,0 +1,2 @@
+profile,kind,width,frequency_mhz,slack_ns,area_um2,latency_cycles,ii_cycles
+bch_d2,dec,64,250,0.94049,92088.862358,260,115

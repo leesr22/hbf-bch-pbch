@@ -44,11 +44,16 @@ module pbch_profile_tb;
     integer dec_start_cycle;
 
     reg enc_start;
+    wire enc_start_ready;
     reg [W-1:0] data_bits;
     reg [COUNT_W-1:0] data_count;
     reg data_valid;
     wire data_ready;
     wire enc_replay_req;
+    reg [W-1:0] enc_replay_bits;
+    reg [COUNT_W-1:0] enc_replay_count;
+    reg enc_replay_valid;
+    wire enc_replay_ready;
     reg [W-1:0] probe_bits;
     reg [COUNT_W-1:0] probe_count;
     reg probe_valid;
@@ -64,6 +69,7 @@ module pbch_profile_tb;
     wire enc_busy;
 
     reg dec_start;
+    wire dec_start_ready;
     reg [W-1:0] code_bits;
     reg [COUNT_W-1:0] code_count;
     reg code_valid;
@@ -84,9 +90,11 @@ module pbch_profile_tb;
     wire dec_busy;
 
     `ENC_TOP enc_u (
-        .clk(clk),.reset_n(reset_n),.start_i(enc_start),
+        .clk(clk),.reset_n(reset_n),.start_i(enc_start),.start_ready_o(enc_start_ready),
         .data_bits_i(data_bits),.data_count_i(data_count),.data_valid_i(data_valid),
         .data_ready_o(data_ready),.replay_req_o(enc_replay_req),
+        .replay_bits_i(enc_replay_bits),.replay_count_i(enc_replay_count),
+        .replay_valid_i(enc_replay_valid),.replay_ready_o(enc_replay_ready),
         .probe_bits_i(probe_bits),.probe_count_i(probe_count),.probe_valid_i(probe_valid),
         .probe_ready_o(probe_ready),.out_bits_o(enc_out_bits),.out_count_o(enc_out_count),
         .out_valid_o(enc_out_valid),.out_ready_i(enc_out_ready),.out_last_o(enc_out_last),
@@ -94,7 +102,7 @@ module pbch_profile_tb;
     );
 
     `DEC_TOP dec_u (
-        .clk(clk),.reset_n(reset_n),.start_i(dec_start),
+        .clk(clk),.reset_n(reset_n),.start_i(dec_start),.start_ready_o(dec_start_ready),
         .code_bits_i(code_bits),.code_count_i(code_count),.code_valid_i(code_valid),
         .code_ready_o(code_ready),.replay_req_o(dec_replay_req),
         .replay_bits_i(replay_bits),.replay_count_i(replay_count),
@@ -166,6 +174,22 @@ module pbch_profile_tb;
         end
     endtask
 
+    task automatic drive_encoder_replay;
+        integer beat;
+        begin
+            beat = 0;
+            while (beat < INFO_BEATS) begin
+                @(negedge clk);
+                enc_replay_valid = 1;
+                enc_replay_bits = message_mem[beat];
+                enc_replay_count = (beat == INFO_BEATS-1) ? K-W*(INFO_BEATS-1) : W;
+                if (enc_replay_ready)
+                    beat = beat + 1;
+            end
+            @(negedge clk); enc_replay_valid = 0;
+        end
+    endtask
+
     task automatic drive_probe_pass;
         integer beat;
         begin
@@ -216,6 +240,7 @@ module pbch_profile_tb;
     initial begin
         failures = 0; enc_out_index = 0; dec_out_index = 0; cycles = 0;
         enc_start=0; data_bits=0; data_count=0; data_valid=0;
+        enc_replay_bits=0; enc_replay_count=0; enc_replay_valid=0;
         probe_bits=0; probe_count=0; probe_valid=0; enc_out_ready=1;
         dec_start=0; code_bits=0; code_count=0; code_valid=0;
         replay_bits=0; replay_count=0; replay_valid=0; info_ready=1;
@@ -237,7 +262,7 @@ module pbch_profile_tb;
             begin
                 drive_data_pass();
                 wait(enc_replay_req);
-                drive_data_pass();
+                drive_encoder_replay();
             end
         join
         wait(enc_done);

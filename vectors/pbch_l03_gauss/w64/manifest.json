@@ -1,0 +1,37 @@
+{
+  "profile": "pbch_l03_gauss",
+  "width": 64,
+  "k": 4096,
+  "l": 3,
+  "r": 104,
+  "n": 4203,
+  "t": 8,
+  "selector": 1,
+  "mask_failures": 7,
+  "probe_positions_stream": [
+    341,
+    761,
+    937,
+    1411,
+    1540,
+    1708,
+    2283,
+    2552,
+    2798,
+    3526,
+    3793,
+    3882
+  ],
+  "errors_polynomial_positions": [
+    299,
+    484,
+    1372,
+    1408,
+    2663,
+    2886,
+    3494,
+    4080
+  ],
+  "message_beats": 64,
+  "codeword_beats": 67
+}

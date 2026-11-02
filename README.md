@@ -25,6 +25,10 @@ library, and reporting conventions.
 - Streaming syndrome, two-phase inversionless Berlekamp-Massey, and parallel Chien
   search. The decoder replays its codeword from an external buffer instead of keeping
   roughly 4 Kbits in flip-flops.
+- Inter-frame pipelines: BCH encoding has a zero-bubble codeword boundary, PBCH
+  overlaps prepare/probe/solve with final emission, and every decoder overlaps
+  syndrome, BM, and replay/Chien work from different codewords. BCH-D2 interleaves
+  two unchanged BM cores because one `t=28` core is slower than the scan stage.
 - PBCH probing of the complete first-pass codeword, including selector and parity
   cells; exact 8-candidate selection for `l=3`; and compact incremental GF(2)
   elimination for `l=15`.
@@ -35,6 +39,22 @@ The compact `l=15` solver preserves every consistent constraint it accepts, but 
 not a global minimum-unmasked-defect optimizer after the constraint set becomes
 inconsistent. This limitation is measured in `results/solver_quality.csv` and is
 spelled out in `docs/architecture_ko.md`.
+
+## Current pipelined result
+
+The common comparison point is `W=64`, 250 MHz, normalized to 3,072 GB/s using
+the verified steady-state codeword initiation interval:
+
+| Defect RBER point | BCH encoder+decoder | PBCH encoder+decoder | PBCH change |
+|---|---:|---:|---:|
+| `1E-4` | 70.395 mm² | 58.281 mm² | -17.2% |
+| `1E-3` | 219.065 mm² | 72.619 mm² | -66.9% |
+
+The detailed pipeline report is in `results/pipeline_final_report_ko.md`.  The
+tracked presentation artifacts are
+`results/figures/pipeline_common_point_table_w64_250mhz.*` and
+`results/figures/pipeline_replicated_area_w64_250mhz.*`.  The optional equal-area
+PBCH sweep and its interpretation are in `results/equal_area_report_ko.md`.
 
 ## Directory map
 
@@ -67,6 +87,16 @@ sim/run_profile.sh pbch_d2 128
 sim/run_all.sh
 ```
 
+Measure latency and steady-state initiation interval with five consecutive frames:
+
+```bash
+sim/run_pipeline.sh bch_d1 64
+sim/run_pipeline.sh pbch_d2 64
+sim/run_pipeline.sh bch_d2 64 zero
+sim/run_pipeline.sh bch_d2 64 mixed
+python3 scripts/collect_pipeline_cycles.py
+```
+
 Run one UMC 28-nm synthesis point or a width matrix at 250 MHz:
 
 ```bash
@@ -80,12 +110,15 @@ Raw Design Compiler reports and mapped netlists are intentionally ignored becaus
 they can expose licensed-library metadata and lab filesystem paths. Aggregate PPA
 results used by the report remain under `results/`.
 
-Finally rebuild the machine-readable and Markdown summaries:
+Finally rebuild the machine-readable and Markdown summaries.  The pipeline report
+uses the common `W=64`, 250-MHz point for all eight encoder/decoder blocks:
 
 ```bash
 python3 scripts/collect_synthesis.py
-python3 scripts/collect_cycles.py
-python3 scripts/analyze_results.py
+python3 scripts/collect_pipeline_cycles.py
+python3 scripts/analyze_pipeline_results.py
+python3 scripts/plot_common_point_table.py
+python3 scripts/plot_replicated_area.py
 ```
 
 The synthesis license server is reachable from the normal lab shell. In a restricted
@@ -93,5 +126,5 @@ container the same command can report an apparent license failure even though th
 tool and license are healthy.
 
 See `docs/architecture_ko.md` for the hardware/dataflow explanation and
-`results/final_report_ko.md` for the evaluated configuration, verification evidence,
-and UMC 28-nm results.
+`results/pipeline_final_report_ko.md` for the common-point pipeline configuration,
+verification evidence, and UMC 28-nm results.

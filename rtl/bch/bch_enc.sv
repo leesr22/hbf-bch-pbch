@@ -18,6 +18,7 @@ module bch_enc #(
     input  wire                 clk,
     input  wire                 reset_n,
     input  wire                 start_i,
+    output wire                 start_ready_o,
     input  wire [W-1:0]         in_bits_i,
     input  wire [COUNT_W-1:0]   in_count_i,
     input  wire                 in_valid_i,
@@ -43,6 +44,11 @@ module bch_enc #(
     integer output_lane;
     integer valid_now;
 
+    // The next frame may be announced while the final parity beat is accepted.
+    // Its first information beat follows on the next cycle, so the output has
+    // no inter-frame idle bubble.
+    assign start_ready_o = (state_q == IDLE) ||
+                           ((state_q == PARITY) && out_ready_i && out_last_o);
     assign busy_o = state_q != IDLE;
     assign in_ready_o = (state_q == INFO) && out_ready_i;
     assign out_valid_o = (state_q == INFO) ? in_valid_i : (state_q == PARITY);
@@ -108,8 +114,15 @@ module bch_enc #(
             end else if (state_q == PARITY && out_ready_i) begin
                 valid_now = ((R - parity_seen_q) > W) ? W : (R - parity_seen_q);
                 if (parity_seen_q + valid_now == R) begin
-                    state_q <= IDLE;
                     done_o <= 1'b1;
+                    if (start_i) begin
+                        state_q <= INFO;
+                        remainder_q <= '0;
+                        info_seen_q <= '0;
+                        parity_seen_q <= '0;
+                    end else begin
+                        state_q <= IDLE;
+                    end
                 end else begin
                     parity_seen_q <= parity_seen_q + valid_now;
                 end

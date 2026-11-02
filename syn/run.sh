@@ -2,10 +2,10 @@
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 if [[ $# -ne 4 ]]; then
-    echo "usage: $0 <bch_d1|bch_d2|pbch_d1|pbch_d2> <enc|dec> <32|64|128|256|512> <MHz>" >&2
+    echo "usage: $0 <profile> <enc|dec> <32|64|128|256|512> <MHz>" >&2
     exit 2
 fi
-case "$1" in bch_d1|bch_d2|pbch_d1|pbch_d2) ;; *) exit 2;; esac
+case "$1" in bch_d1|bch_d2|pbch_d1|pbch_d2|pbch_l*_exact|pbch_l*_gauss|pbch_l*_pipe) ;; *) exit 2;; esac
 case "$2" in enc|dec) ;; *) exit 2;; esac
 case "$3" in 32|64|128|256|512) ;; *) exit 2;; esac
 if ! [[ "$4" =~ ^[0-9]+$ ]]; then exit 2; fi

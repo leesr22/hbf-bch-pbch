@@ -45,7 +45,7 @@ def encoder_wrapper(name, k, r, generator, width):
     top = "%s_enc_w%d" % (name, width)
     return f"""
 module {top} (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [{width-1}:0] in_bits_i,input wire [$clog2({width}+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [{width-1}:0] out_bits_o,output wire [$clog2({width}+1)-1:0] out_count_o,
@@ -53,7 +53,7 @@ module {top} (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K({k}),.R({r}),.W({width}),.GENERATOR({literal(r+1,generator)})) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
@@ -62,6 +62,7 @@ endmodule
 
 
 def decoder_wrapper(name, k, n, t, width):
+    bm_lanes = 2 if t >= 28 else 1
     partial_a = (n-k) % width
     full_state, full_input = syndrome_factors(t, width, width)
     a_state, a_input = syndrome_factors(t, width, partial_a)
@@ -75,7 +76,7 @@ def decoder_wrapper(name, k, n, t, width):
     top = "%s_dec_w%d" % (name, width)
     return f"""
 module {top} (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [{width-1}:0] code_bits_i,input wire [$clog2({width}+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [{width-1}:0] replay_bits_i,input wire [$clog2({width}+1)-1:0] replay_count_i,
@@ -84,7 +85,7 @@ module {top} (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2({t}+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T({t}),.K({k}),.N({n}),.W({width}),
+    bch_dec #(.M(13),.T({t}),.K({k}),.N({n}),.W({width}),.BM_LANES({bm_lanes}),
         .PARTIAL_A({partial_a}),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE({literal(t*M,pack(full_state,M))}),
@@ -98,7 +99,7 @@ module {top} (
         .CHIEN_ADVANCE_FULL({literal((t+1)*M,pack(advance_full,M))}),
         .CHIEN_ADVANCE_PARTIAL_A({literal((t+1)*M,pack(advance_a,M))}),
         .CHIEN_ADVANCE_PARTIAL_B({literal((t+1)*M,pack(advance_b,M))})) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -109,15 +110,20 @@ endmodule
 """
 
 
-def pbch_encoder_wrapper(name, profile, width):
+def pbch_encoder_wrapper(
+        name, profile, width, solver_exact=None, solver_pipelined=False):
+    if solver_exact is None:
+        solver_exact = profile.l <= 3
     parity_columns = profile.influence_columns()[profile.l + profile.k:]
     parity_packed = pack(parity_columns, profile.l)
     top = "%s_enc_w%d" % (name, width)
     return f"""
 module {top} (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [{width-1}:0] data_bits_i,input wire [$clog2({width}+1)-1:0] data_count_i,
     input wire data_valid_i,output wire data_ready_o,output wire replay_req_o,
+    input wire [{width-1}:0] replay_bits_i,input wire [$clog2({width}+1)-1:0] replay_count_i,
+    input wire replay_valid_i,output wire replay_ready_o,
     input wire [{width-1}:0] probe_bits_i,input wire [$clog2({width}+1)-1:0] probe_count_i,
     input wire probe_valid_i,output wire probe_ready_o,
     output wire [{width-1}:0] out_bits_o,output wire [$clog2({width}+1)-1:0] out_count_o,
@@ -130,10 +136,14 @@ module {top} (
         .BCH_GENERATOR({literal(profile.parent.r+1,profile.parent.generator)}),
         .MASK_POLYNOMIAL({literal(profile.l+1,profile.mask_primitive)}),
         .MASK_SEED({literal(profile.l,profile.mask_seed)}),
+        .EXACT_SOLVER({int(solver_exact)}),
+        .PIPELINED_SOLVER({int(solver_pipelined)}),
         .PARITY_COLUMNS({literal(profile.parent.r*profile.l,parity_packed)})) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .data_bits_i(data_bits_i),.data_count_i(data_count_i),.data_valid_i(data_valid_i),
         .data_ready_o(data_ready_o),.replay_req_o(replay_req_o),
+        .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
+        .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
         .probe_bits_i(probe_bits_i),.probe_count_i(probe_count_i),
         .probe_valid_i(probe_valid_i),.probe_ready_o(probe_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
@@ -159,7 +169,7 @@ def pbch_decoder_wrapper(name, profile, width):
     top = "%s_dec_w%d" % (name, width)
     return f"""
 module {top} (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [{width-1}:0] code_bits_i,input wire [$clog2({width}+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [{width-1}:0] replay_bits_i,input wire [$clog2({width}+1)-1:0] replay_count_i,
@@ -184,7 +194,7 @@ module {top} (
         .CHIEN_ADVANCE_PARTIAL_B({literal((t+1)*M,pack(advance_b,M))}),
         .MASK_POLYNOMIAL({literal(profile.l+1,profile.mask_primitive)}),
         .MASK_SEED({literal(profile.l,profile.mask_seed)})) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),
         .code_ready_o(code_ready_o),.replay_req_o(replay_req_o),
         .replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
@@ -238,14 +248,16 @@ def write_vectors(name, profile, width):
     }, indent=2)+"\n")
 
 
-def write_pbch_vectors(name, profile, width):
+def write_pbch_vectors(name, profile, width, solver_exact=None):
     out = ROOT / "vectors" / name / ("w%d" % width)
     out.mkdir(parents=True, exist_ok=True)
     rng = random.Random(0xB0C100 + width + profile.l)
     message = rng.getrandbits(profile.k)
     defect_count = 12 if profile.l == 3 else 32
     probe_positions = sorted(rng.sample(range(profile.n), defect_count))
-    if profile.l == 3:
+    if solver_exact is None:
+        solver_exact = profile.l <= 3
+    if solver_exact:
         selector, failures = profile.exact_selector(message, probe_positions)
     else:
         selector, failures = profile.greedy_selector(message, probe_positions)

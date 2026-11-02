@@ -17,13 +17,18 @@ set common_sources [list]
 if {$kind == "enc"} {
     lappend common_sources "$root/rtl/bch/bch_enc.sv"
     if {[string match "pbch_*" $profile]} {
+        if {[string match "pbch_l*" $profile]} {
+            set pbch_wrapper "$root/rtl/generated/pbch_sweep_wrappers.sv"
+        } else {
+            set pbch_wrapper "$root/rtl/generated/pbch_wrappers.sv"
+        }
         lappend common_sources \
             "$root/rtl/pbch/pbch_g0.sv" \
             "$root/rtl/pbch/pbch_probe.sv" \
             "$root/rtl/pbch/pbch_solve.sv" \
             "$root/rtl/pbch/pbch_mask.sv" \
             "$root/rtl/pbch/pbch_enc.sv" \
-            "$root/rtl/generated/pbch_wrappers.sv"
+            $pbch_wrapper
     } else {
         lappend common_sources "$root/rtl/generated/bch_wrappers.sv"
     }
@@ -34,10 +39,15 @@ if {$kind == "enc"} {
         "$root/rtl/bch/bch_chien.sv" \
         "$root/rtl/bch/bch_dec.sv"
     if {[string match "pbch_*" $profile]} {
+        if {[string match "pbch_l*" $profile]} {
+            set pbch_wrapper "$root/rtl/generated/pbch_sweep_wrappers.sv"
+        } else {
+            set pbch_wrapper "$root/rtl/generated/pbch_wrappers.sv"
+        }
         lappend common_sources \
             "$root/rtl/pbch/pbch_mask.sv" \
             "$root/rtl/pbch/pbch_dec.sv" \
-            "$root/rtl/generated/pbch_wrappers.sv"
+            $pbch_wrapper
     } else {
         lappend common_sources "$root/rtl/generated/bch_wrappers.sv"
     }

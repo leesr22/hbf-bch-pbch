@@ -8,3 +8,7 @@ syn/results/*/mapped.v
 syn/reports/
 syn/results/
 *.log
+# Superseded pre-pipeline presentation exports.  The authoritative figures use
+# the pipeline_ prefix and are tracked under results/figures/.
+results/figures/common_point_table_w64_250mhz.*
+results/figures/replicated_area_w64_250mhz.*

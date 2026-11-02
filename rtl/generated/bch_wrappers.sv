@@ -1,7 +1,7 @@
 `default_nettype none
 
 module bch_d1_enc_w32 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [31:0] in_bits_i,input wire [$clog2(32+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [31:0] out_bits_o,output wire [$clog2(32+1)-1:0] out_count_o,
@@ -9,14 +9,14 @@ module bch_d1_enc_w32 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(156),.W(32),.GENERATOR(157'h1e4873256115a56784a6940a4c6e6d7e1205e051)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d1_dec_w32 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [31:0] code_bits_i,input wire [$clog2(32+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [31:0] replay_bits_i,input wire [$clog2(32+1)-1:0] replay_count_i,
@@ -25,7 +25,7 @@ module bch_d1_dec_w32 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(12+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(32),
+    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(32),.BM_LANES(1),
         .PARTIAL_A(28),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(156'hc99889816fda61c4adf8d9f81326868dc0d1176),
@@ -39,7 +39,7 @@ module bch_d1_dec_w32 (
         .CHIEN_ADVANCE_FULL(169'h05da367a0d3027920268510346fa61034365a2ec001),
         .CHIEN_ADVANCE_PARTIAL_A(169'h176ab8b9ce83244d027777afb4ebdb71a3120a28001),
         .CHIEN_ADVANCE_PARTIAL_B(169'h0001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -49,7 +49,7 @@ module bch_d1_dec_w32 (
 endmodule
 
 module bch_d1_enc_w64 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [63:0] in_bits_i,input wire [$clog2(64+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [63:0] out_bits_o,output wire [$clog2(64+1)-1:0] out_count_o,
@@ -57,14 +57,14 @@ module bch_d1_enc_w64 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(156),.W(64),.GENERATOR(157'h1e4873256115a56784a6940a4c6e6d7e1205e051)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d1_dec_w64 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [63:0] code_bits_i,input wire [$clog2(64+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [63:0] replay_bits_i,input wire [$clog2(64+1)-1:0] replay_count_i,
@@ -73,7 +73,7 @@ module bch_d1_dec_w64 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(12+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(64),
+    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(64),.BM_LANES(1),
         .PARTIAL_A(28),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(156'h5ce1dd0a4673b1e783dfd06f44e5b20d2880d96),
@@ -87,7 +87,7 @@ module bch_d1_dec_w64 (
         .CHIEN_ADVANCE_FULL(169'h1c2af41cc2de88a99e5b1769069920a206985b2c001),
         .CHIEN_ADVANCE_PARTIAL_A(169'h176ab8b9ce83244d027777afb4ebdb71a3120a28001),
         .CHIEN_ADVANCE_PARTIAL_B(169'h0001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -97,7 +97,7 @@ module bch_d1_dec_w64 (
 endmodule
 
 module bch_d1_enc_w128 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [127:0] in_bits_i,input wire [$clog2(128+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [127:0] out_bits_o,output wire [$clog2(128+1)-1:0] out_count_o,
@@ -105,14 +105,14 @@ module bch_d1_enc_w128 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(156),.W(128),.GENERATOR(157'h1e4873256115a56784a6940a4c6e6d7e1205e051)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d1_dec_w128 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [127:0] code_bits_i,input wire [$clog2(128+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [127:0] replay_bits_i,input wire [$clog2(128+1)-1:0] replay_count_i,
@@ -121,7 +121,7 @@ module bch_d1_dec_w128 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(12+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(128),
+    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(128),.BM_LANES(1),
         .PARTIAL_A(28),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(156'ha62eca12bab7d9edd48c124833371cc2cbb5a61),
@@ -135,7 +135,7 @@ module bch_d1_dec_w128 (
         .CHIEN_ADVANCE_FULL(169'h07850496e9d06740c371f0aa616a992ed64834c2001),
         .CHIEN_ADVANCE_PARTIAL_A(169'h176ab8b9ce83244d027777afb4ebdb71a3120a28001),
         .CHIEN_ADVANCE_PARTIAL_B(169'h0001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -145,7 +145,7 @@ module bch_d1_dec_w128 (
 endmodule
 
 module bch_d1_enc_w256 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [255:0] in_bits_i,input wire [$clog2(256+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [255:0] out_bits_o,output wire [$clog2(256+1)-1:0] out_count_o,
@@ -153,14 +153,14 @@ module bch_d1_enc_w256 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(156),.W(256),.GENERATOR(157'h1e4873256115a56784a6940a4c6e6d7e1205e051)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d1_dec_w256 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [255:0] code_bits_i,input wire [$clog2(256+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [255:0] replay_bits_i,input wire [$clog2(256+1)-1:0] replay_count_i,
@@ -169,7 +169,7 @@ module bch_d1_dec_w256 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(12+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(256),
+    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(256),.BM_LANES(1),
         .PARTIAL_A(156),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(156'h2fea6e4f240f2548c41c26531ed69ee9f855920),
@@ -183,7 +183,7 @@ module bch_d1_dec_w256 (
         .CHIEN_ADVANCE_FULL(169'h0e1f099276a63d58ad699e1774f40ce152a67240001),
         .CHIEN_ADVANCE_PARTIAL_A(169'h00509fa1f2f802a669ce80307578a557cc615748001),
         .CHIEN_ADVANCE_PARTIAL_B(169'h0001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -193,7 +193,7 @@ module bch_d1_dec_w256 (
 endmodule
 
 module bch_d1_enc_w512 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [511:0] in_bits_i,input wire [$clog2(512+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [511:0] out_bits_o,output wire [$clog2(512+1)-1:0] out_count_o,
@@ -201,14 +201,14 @@ module bch_d1_enc_w512 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(156),.W(512),.GENERATOR(157'h1e4873256115a56784a6940a4c6e6d7e1205e051)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d1_dec_w512 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [511:0] code_bits_i,input wire [$clog2(512+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [511:0] replay_bits_i,input wire [$clog2(512+1)-1:0] replay_count_i,
@@ -217,7 +217,7 @@ module bch_d1_dec_w512 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(12+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(512),
+    bch_dec #(.M(13),.T(12),.K(4096),.N(4252),.W(512),.BM_LANES(1),
         .PARTIAL_A(156),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(156'hc1fced1e15532a26625cbb9ab6e092768f0aa99),
@@ -231,7 +231,7 @@ module bch_d1_dec_w512 (
         .CHIEN_ADVANCE_FULL(169'h19ae2ee1ec756d570e09387d3b558a3c2d031532001),
         .CHIEN_ADVANCE_PARTIAL_A(169'h00509fa1f2f802a669ce80307578a557cc615748001),
         .CHIEN_ADVANCE_PARTIAL_B(169'h0001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -241,7 +241,7 @@ module bch_d1_dec_w512 (
 endmodule
 
 module bch_d2_enc_w32 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [31:0] in_bits_i,input wire [$clog2(32+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [31:0] out_bits_o,output wire [$clog2(32+1)-1:0] out_count_o,
@@ -249,14 +249,14 @@ module bch_d2_enc_w32 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(364),.W(32),.GENERATOR(365'h1bb4b458a849595166cf6d0ad95b440162fb31231b54913bd16b7f4fd1b65c5386132d4f11e7ebd57763425a5aa3)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d2_dec_w32 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [31:0] code_bits_i,input wire [$clog2(32+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [31:0] replay_bits_i,input wire [$clog2(32+1)-1:0] replay_count_i,
@@ -265,7 +265,7 @@ module bch_d2_dec_w32 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(28+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(32),
+    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(32),.BM_LANES(2),
         .PARTIAL_A(12),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(364'h3c37665a16952925a3e072c53a53342801e74349ab120dbba7b4c99889816fda61c4adf8d9f81326868dc0d1176),
@@ -279,7 +279,7 @@ module bch_d2_dec_w32 (
         .CHIEN_ADVANCE_FULL(377'h06e36ee83dcf69c2ac99fa0c44d30b05bbd13b4ca991c4f2d96fc5da367a0d3027920268510346fa61034365a2ec001),
         .CHIEN_ADVANCE_PARTIAL_A(377'h176a196461496981363b2e0c3256f369b1819a43440dc5f7ad749af235ff3c857806871a4c509b5f05bdc616a000001),
         .CHIEN_ADVANCE_PARTIAL_B(377'h00010008004002001000800400200100080040020010008004002001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -289,7 +289,7 @@ module bch_d2_dec_w32 (
 endmodule
 
 module bch_d2_enc_w64 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [63:0] in_bits_i,input wire [$clog2(64+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [63:0] out_bits_o,output wire [$clog2(64+1)-1:0] out_count_o,
@@ -297,14 +297,14 @@ module bch_d2_enc_w64 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(364),.W(64),.GENERATOR(365'h1bb4b458a849595166cf6d0ad95b440162fb31231b54913bd16b7f4fd1b65c5386132d4f11e7ebd57763425a5aa3)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d2_dec_w64 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [63:0] code_bits_i,input wire [$clog2(64+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [63:0] replay_bits_i,input wire [$clog2(64+1)-1:0] replay_count_i,
@@ -313,7 +313,7 @@ module bch_d2_dec_w64 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(28+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(64),
+    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(64),.BM_LANES(2),
         .PARTIAL_A(44),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(364'h70d09bb60c7c75bf8db453481c0b7f1b2a670ca57b36cd448b1e5ce1dd0a4673b1e783dfd06f44e5b20d2880d96),
@@ -327,7 +327,7 @@ module bch_d2_dec_w64 (
         .CHIEN_ADVANCE_FULL(377'h1ad3512548d63c7855ce0248ee9ba7291a0cce7740c1e79b8c1efc2af41cc2de88a99e5b1769069920a206985b2c001),
         .CHIEN_ADVANCE_PARTIAL_A(377'h037756c6c8a30943452738ca48895b7b8061d109e83273dddf1ff590c45c147d286cfb8bae0c09a3b935f8c06ffe001),
         .CHIEN_ADVANCE_PARTIAL_B(377'h00010008004002001000800400200100080040020010008004002001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -337,7 +337,7 @@ module bch_d2_dec_w64 (
 endmodule
 
 module bch_d2_enc_w128 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [127:0] in_bits_i,input wire [$clog2(128+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [127:0] out_bits_o,output wire [$clog2(128+1)-1:0] out_count_o,
@@ -345,14 +345,14 @@ module bch_d2_enc_w128 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(364),.W(128),.GENERATOR(365'h1bb4b458a849595166cf6d0ad95b440162fb31231b54913bd16b7f4fd1b65c5386132d4f11e7ebd57763425a5aa3)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d2_dec_w128 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [127:0] code_bits_i,input wire [$clog2(128+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [127:0] replay_bits_i,input wire [$clog2(128+1)-1:0] replay_count_i,
@@ -361,7 +361,7 @@ module bch_d2_dec_w128 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(28+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(128),
+    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(128),.BM_LANES(2),
         .PARTIAL_A(108),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(364'hcdfdcd1bdbe1b07b5fa442574ba46de4600e82802cf9c22d74f7a62eca12bab7d9edd48c124833371cc2cbb5a61),
@@ -375,7 +375,7 @@ module bch_d2_dec_w128 (
         .CHIEN_ADVANCE_FULL(377'h1c128b5c41e9eee1fa6284cb6509da4aecc796fb58a9edeb4ea467850496e9d06740c371f0aa616a992ed64834c2001),
         .CHIEN_ADVANCE_PARTIAL_A(377'h0e2cbe58f00657d7554e9035d4c794c275ee5154a24f759c1b803a4e56c70bc6c2ddd1561fa0bb2ef41961818578001),
         .CHIEN_ADVANCE_PARTIAL_B(377'h00010008004002001000800400200100080040020010008004002001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -385,7 +385,7 @@ module bch_d2_dec_w128 (
 endmodule
 
 module bch_d2_enc_w256 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [255:0] in_bits_i,input wire [$clog2(256+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [255:0] out_bits_o,output wire [$clog2(256+1)-1:0] out_count_o,
@@ -393,14 +393,14 @@ module bch_d2_enc_w256 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(364),.W(256),.GENERATOR(365'h1bb4b458a849595166cf6d0ad95b440162fb31231b54913bd16b7f4fd1b65c5386132d4f11e7ebd57763425a5aa3)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d2_dec_w256 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [255:0] code_bits_i,input wire [$clog2(256+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [255:0] replay_bits_i,input wire [$clog2(256+1)-1:0] replay_count_i,
@@ -409,7 +409,7 @@ module bch_d2_dec_w256 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(28+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(256),
+    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(256),.BM_LANES(2),
         .PARTIAL_A(108),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(364'h5fd4dc9e481e4a9108544c8627adedd5709f25b8a0d68598e0f92fea6e4f240f2548c41c26531ed69ee9f855920),
@@ -423,7 +423,7 @@ module bch_d2_dec_w256 (
         .CHIEN_ADVANCE_FULL(377'h02c5663e25c1f39ae2fe97713727b13c96ad81e5570548f04a20ee1f099276a63d58ad699e1774f40ce152a67240001),
         .CHIEN_ADVANCE_PARTIAL_A(377'h0e2cbe58f00657d7554e9035d4c794c275ee5154a24f759c1b803a4e56c70bc6c2ddd1561fa0bb2ef41961818578001),
         .CHIEN_ADVANCE_PARTIAL_B(377'h00010008004002001000800400200100080040020010008004002001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),
@@ -433,7 +433,7 @@ module bch_d2_dec_w256 (
 endmodule
 
 module bch_d2_enc_w512 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [511:0] in_bits_i,input wire [$clog2(512+1)-1:0] in_count_i,
     input wire in_valid_i,output wire in_ready_o,
     output wire [511:0] out_bits_o,output wire [$clog2(512+1)-1:0] out_count_o,
@@ -441,14 +441,14 @@ module bch_d2_enc_w512 (
     output wire done_o,output wire busy_o
 );
     bch_enc #(.K(4096),.R(364),.W(512),.GENERATOR(365'h1bb4b458a849595166cf6d0ad95b440162fb31231b54913bd16b7f4fd1b65c5386132d4f11e7ebd57763425a5aa3)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .in_bits_i(in_bits_i),.in_count_i(in_count_i),.in_valid_i(in_valid_i),.in_ready_o(in_ready_o),
         .out_bits_o(out_bits_o),.out_count_o(out_count_o),.out_valid_o(out_valid_o),
         .out_ready_i(out_ready_i),.out_last_o(out_last_o),.done_o(done_o),.busy_o(busy_o));
 endmodule
 
 module bch_d2_dec_w512 (
-    input wire clk,input wire reset_n,input wire start_i,
+    input wire clk,input wire reset_n,input wire start_i,output wire start_ready_o,
     input wire [511:0] code_bits_i,input wire [$clog2(512+1)-1:0] code_count_i,
     input wire code_valid_i,output wire code_ready_o,output wire replay_req_o,
     input wire [511:0] replay_bits_i,input wire [$clog2(512+1)-1:0] replay_count_i,
@@ -457,7 +457,7 @@ module bch_d2_dec_w512 (
     output wire info_valid_o,input wire info_ready_i,output wire done_o,
     output wire success_o,output wire [$clog2(28+1)-1:0] error_count_o,output wire busy_o
 );
-    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(512),
+    bch_dec #(.M(13),.T(28),.K(4096),.N(4460),.W(512),.BM_LANES(2),
         .PARTIAL_A(364),.PARTIAL_B(0),
         .PRIMITIVE_POLYNOMIAL(14'h201b),
         .SYN_FULL_STATE(364'h068bb9b8674fe88309c6ee0af58329dcfc28a7f441c4d5771577c1fced1e15532a26625cbb9ab6e092768f0aa99),
@@ -471,7 +471,7 @@ module bch_d2_dec_w512 (
         .CHIEN_ADVANCE_FULL(377'h13475dc3d8aaeeafbc1ff0fa768b0f785200ea64002a260b1712f9ae2ee1ec756d570e09387d3b558a3c2d031532001),
         .CHIEN_ADVANCE_PARTIAL_A(377'h189d0e7b5ca477b57b868fc8b7241b615484a6fb6e9946ba31efad06e41feb85b437dc83ea173a28fc9ceeccf1f4001),
         .CHIEN_ADVANCE_PARTIAL_B(377'h00010008004002001000800400200100080040020010008004002001000800400200100080040020010008004002001)) core (
-        .clk(clk),.reset_n(reset_n),.start_i(start_i),
+        .clk(clk),.reset_n(reset_n),.start_i(start_i),.start_ready_o(start_ready_o),
         .code_bits_i(code_bits_i),.code_count_i(code_count_i),.code_valid_i(code_valid_i),.code_ready_o(code_ready_o),
         .replay_req_o(replay_req_o),.replay_bits_i(replay_bits_i),.replay_count_i(replay_count_i),
         .replay_valid_i(replay_valid_i),.replay_ready_o(replay_ready_o),

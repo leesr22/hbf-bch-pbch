@@ -1,0 +1,3 @@
+l,ber_defect,mean_physical_defects_2np,trials,trials_with_unmasked_constraints,observed_failure_probability,mean_unmasked_constraints,max_unmasked_constraints,exact_mean_unmasked_constraints,greedy_optimal_fraction
+11,0.0007378195207278585,6.2139160035700245,10000,587,0.0587,0.0673,4,0.0605,0.9941
+55,0.00342123237,29.1146874687,10000,59,0.0059,0.0059,1,,
